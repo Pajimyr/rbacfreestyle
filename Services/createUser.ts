@@ -1,19 +1,19 @@
-import { hashPass } from "../tools/hashPass";
-import { User } from "../types";
+import { hashPass } from "../tools/hashPass.js";
+import { supabase } from "./supabaseClient.js";
 
-export const createUser = async (
-  userName: string,
-  pass: string,
-  arr: User[],
-) => {
+export const createUser = async (userName: string, pass: string) => {
   const hashedPass = await hashPass(pass);
 
-  arr.push({
-    id: Math.random(),
-    pass: hashedPass,
-    userName: userName,
-    role: roles.user,
-  });
+  const { data, error } = await supabase
+    .from("users")
+    .insert({ username: userName, passwd: hashedPass, role_id: 2 })
+    .select()
+    .single();
 
-  console.log(arr);
+  if (error) {
+    console.error("Chyba při vytváření uživatele:", error.message);
+    return null;
+  }
+
+  return `Uživatel úspěšně vytvořen: ` + data.username;
 };
