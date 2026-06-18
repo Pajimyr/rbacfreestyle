@@ -1,10 +1,12 @@
-import { users } from "..";
-import { Actions } from "../types";
+import { getUserByUsername } from "../Queries/getUserByUsername.js";
 
-export const checkPermissionsForAction = (
-  id: number,
-  action: keyof Actions,
-): boolean => {
-  if (!users[id]) return false;
-  return users[id].role.permissions[action];
+export const checkPermissionsForAction = async (
+  username:string
+): Promise<boolean> => {
+  
+  const checkedUser = await getUserByUsername(username);
+  if (!checkedUser) return false;
+
+  const roles = checkedUser.roles as unknown as { role: string };
+  return roles.role === "admin";
 };
